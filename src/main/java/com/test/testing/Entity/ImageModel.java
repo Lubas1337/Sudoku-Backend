@@ -16,8 +16,8 @@ public class ImageModel {
     private byte[] imageBytes;
     @JsonIgnore
     private Long userId;
-    @JsonIgnore
-    private Long postId;
+    private String fileType;
+
 
     public ImageModel() {
     }

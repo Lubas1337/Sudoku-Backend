@@ -34,8 +34,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) ->
-                        authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                        authorize
+                                .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                                 .requestMatchers(SecurityConstants.SIGN_UP_URLS).permitAll()
+                                .requestMatchers("/api/game/**").authenticated()
+                                .requestMatchers("/api/get/**").authenticated()
+                                .requestMatchers("/api/image/**").authenticated()
+                                .requestMatchers("/api/user/**").authenticated()
+                                .requestMatchers("/api/hello").authenticated()
+                                .requestMatchers("/**").authenticated()
+
+
                                 .anyRequest().authenticated()
 
                 ).exceptionHandling( exception -> exception

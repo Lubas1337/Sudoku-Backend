@@ -36,15 +36,15 @@ public class JWTTokenProvider {
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + jwtExpirationDate);
 
-
         return Jwts.builder()
                 .setSubject(userId)
+                .setClaims(claimsMap)  // Set the claims including the "id" claim
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(key())
                 .compact();
-
     }
+
 
     public boolean validateToken(String token) {
         try {
@@ -65,7 +65,7 @@ public class JWTTokenProvider {
 
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(SecurityConstants.SECRET)
+                .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
         String id = (String) claims.get("id");
