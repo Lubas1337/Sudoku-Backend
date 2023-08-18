@@ -12,4 +12,5 @@ import lombok.Setter;
 public class SudokuUpdateRequest {
     private int[] solution;
     private int[] puzzle;
+    private Long timer;
 }

@@ -1,7 +1,7 @@
 package com.test.testing.gameLogic;
 
-import com.test.testing.Entity.ImageModel;
 import com.test.testing.Entity.UserEntity;
+import com.test.testing.gameLogic.domain.DifficultyLevel;
 import com.test.testing.gameLogic.domain.Sudoku;
 import com.test.testing.gameLogic.domain.SudokuRepository;
 import com.test.testing.gameLogic.util.SudokuUtil;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+
+import static com.test.testing.gameLogic.util.SudokuUtil.computeDifficulty;
 
 @Service
 public class SudokuService {
@@ -33,18 +35,28 @@ public class SudokuService {
         this.userRepository = userRepository;
     }
 
-    public Sudoku generateSudoku(Principal principal) {
+
+
+    public Sudoku generateSudoku(Principal principal, DifficultyLevel difficulty) {
         Sudoku sudoku = SudokuUtil.createSudoku();
+        Sudoku entity = createSudokuEntity(sudoku, principal, difficulty);
+        return sudokuRepository.save(entity);
+    }
+
+
+    private Sudoku createSudokuEntity(Sudoku sudoku, Principal principal, DifficultyLevel difficulty) {
         Sudoku entity = new Sudoku(sudoku.getSolution(), sudoku.getPuzzle());
 
         UserEntity user = getUserByPrincipal(principal);
         entity.setUserId(user.getId());
 
-        sudokuRepository.save(entity);
-        sudoku.setId(entity.getId());
-        sudoku.setTimer(System.currentTimeMillis()); // Start the timer
-        return sudoku;
+        entity.setDifficulty(difficulty);
+        entity.setTimer(System.currentTimeMillis());
+
+        return entity;
     }
+
+
 
     public Sudoku updateSudoku(long sudokuId, int[] newSolution, int[] newPuzzle, long elapsedTime) {
         Optional<Sudoku> optionalSudoku = sudokuRepository.findById(sudokuId);
@@ -69,7 +81,9 @@ public class SudokuService {
 
     }
 
-    public List<Sudoku> getAllSudokusByUserId(Long userId) {
+    public List<Sudoku> getAllSudokusByUserId(Principal principal) {
+        UserEntity user = getUserByPrincipal(principal);
+        Long userId = user.getId();
         return sudokuRepository.findByUserId(userId);
     }
 }

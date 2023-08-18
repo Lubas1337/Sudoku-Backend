@@ -1,9 +1,11 @@
 package com.test.testing.gameLogic.util;
 
+import com.test.testing.gameLogic.domain.DifficultyLevel;
 import com.test.testing.gameLogic.domain.Sudoku;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 @Component
@@ -176,27 +178,31 @@ public class SudokuUtil {
     }
 
     // todo: compute difficulty
-    public static double computeDifficulty(int[] puzzle) {
-        int[] solution = new int[puzzle.length];
-        System.arraycopy(puzzle, 0, solution, 0, puzzle.length);
-
-        int solvedCount = solve(solution, 1, 0);
-
-        double difficulty;
-
-        // Define ranges or thresholds for each difficulty level
-        int normalThreshold = 40; // Adjust as needed
-        int hardThreshold = 30; // Adjust as needed
-
-        if (solvedCount <= hardThreshold) {
-            difficulty = 3.0;
-        } else if (solvedCount <= normalThreshold) {
-            difficulty = 2.0;
-        } else {
-            difficulty = 1.0; // Easy difficulty
+    public static DifficultyLevel computeDifficulty(int[] puzzle) {
+        int clueCount = 0;
+        for (int cellValue : puzzle) {
+            if (cellValue != 0) {
+                clueCount++;
+            }
         }
 
-        return difficulty;
+        int easyThreshold = 20;
+        int normalThreshold = 30;
+        int hardThreshold = 40;
+
+        if (clueCount <= hardThreshold) {
+            return DifficultyLevel.HARD;
+        } else if (clueCount <= normalThreshold) {
+            return DifficultyLevel.NORMAL;
+        } else if (clueCount <= easyThreshold) {
+            return DifficultyLevel.EASY;
+        } else {
+            return DifficultyLevel.EASY; // Default to EASY for very high clue counts
+        }
     }
+
+
+
+
 
 }

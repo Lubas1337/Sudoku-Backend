@@ -28,12 +28,12 @@ public class Sudoku {
     private int[] puzzle;
 
     @Getter
-    private double difficulty;
+    private DifficultyLevel difficulty;
 
     @JsonIgnore
     private Long userId;
 
-    private long timer; // Add the timer field
+    private Long timer;
 
 
 

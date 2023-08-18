@@ -6,7 +6,6 @@ import com.test.testing.services.UserService;
 import com.test.testing.validations.ResponseErrorValidation;
 import com.test.testing.web.mappers.UserMapper;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
@@ -19,13 +18,15 @@ import java.security.Principal;
 @RequestMapping("/api/user")
 @CrossOrigin
 public class UserController {
+    private final UserService userService;
+    private final UserMapper userFacade;
+    private final ResponseErrorValidation responseErrorValidation;
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserMapper userFacade;
-    @Autowired
-    private ResponseErrorValidation responseErrorValidation;
+    public UserController(UserService userService, UserMapper userFacade, ResponseErrorValidation responseErrorValidation) {
+        this.userService = userService;
+        this.userFacade = userFacade;
+        this.responseErrorValidation = responseErrorValidation;
+    }
 
     @GetMapping("/")
     public ResponseEntity<UserDTO> getCurrentUser(Principal principal) {

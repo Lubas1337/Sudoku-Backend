@@ -29,42 +29,13 @@ public class ImageUploadController {
     @Autowired
     private ImageUploadService imageUploadService;
 
-    @Autowired
-    private ImageRepository imageRepository;
-
-
     @PostMapping("/upload")
-    public ResponseEntity<MessageResponse> uploadImageToUser(@RequestParam("file") MultipartFile file,
-                                                             Principal principal) throws IOException {
-
+    public ResponseEntity<MessageResponse> uploadImageToUser(@RequestParam("file") MultipartFile file, Principal principal) throws IOException {
         imageUploadService.uploadImageToUser(file, principal);
         return ResponseEntity.ok(new MessageResponse("Image Uploaded Successfully"));
     }
-
-
     @GetMapping("/profileImage")
-    public ResponseEntity<ImageModel> getImageForUser(Principal principal) {
-        ImageModel userImage = imageUploadService.getImageToUser(principal);
-        return new ResponseEntity<>(userImage, HttpStatus.OK);
+    public ResponseEntity<byte[]> getUserImage(Principal principal) {
+        return imageUploadService.getImageToUser(principal);
     }
-
-
-    @GetMapping("/getContent/{imageId}")
-    public ResponseEntity<byte[]> downloadImage(@PathVariable Long imageId) {
-        Optional<ImageModel> imageModelOptional = imageRepository.findById(imageId);
-
-        if (imageModelOptional.isPresent()) {
-            ImageModel imageModel = imageModelOptional.get();
-            byte[] imageBytes = imageModel.getImageBytes();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            headers.setContentLength(imageBytes.length);
-
-            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
 }
