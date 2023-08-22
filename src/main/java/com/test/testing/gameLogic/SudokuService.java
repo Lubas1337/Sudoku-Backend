@@ -86,5 +86,10 @@ public class SudokuService {
         Long userId = user.getId();
         return sudokuRepository.findByUserId(userId);
     }
+
+    public void deleteSudoku(long sudokuId) {
+        sudokuRepository.deleteById(sudokuId);
+    }
+
 }
 

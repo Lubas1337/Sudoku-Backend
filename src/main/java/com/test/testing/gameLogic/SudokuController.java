@@ -42,4 +42,9 @@ public class SudokuController {
         List<Sudoku> sudoku = sudokuService.getAllSudokusByUserId(principal);
         return ResponseEntity.ok(sudoku);
     }
+    @DeleteMapping("/delete/{sudokuId}")
+    public ResponseEntity<String> deleteSudoku(@PathVariable long sudokuId) {
+        sudokuService.deleteSudoku(sudokuId);
+        return ResponseEntity.ok("Sudoku puzzle with ID " + sudokuId + " has been deleted.");
+    }
 }
