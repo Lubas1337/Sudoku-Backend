@@ -1,7 +1,6 @@
 package com.test.testing.sudoku.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +17,8 @@ public class SudokuCellId implements Serializable {
 
     @Column(name = "col")
     private int col;
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "game_id")
+    private int gameId;
 }

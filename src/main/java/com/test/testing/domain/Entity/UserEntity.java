@@ -29,12 +29,15 @@ public class UserEntity implements UserDetails {
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserEntity(String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserEntity(Long id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
+
+
 
     /**
      * SECURITY

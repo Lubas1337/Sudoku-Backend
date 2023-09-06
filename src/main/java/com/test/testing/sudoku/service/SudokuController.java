@@ -1,30 +1,24 @@
 package com.test.testing.sudoku.service;
 
 import com.test.testing.domain.Entity.UserEntity;
-import com.test.testing.domain.repository.UserRepository;
-import com.test.testing.sudoku.domain.SolvedSudokuDTO;
 import com.test.testing.sudoku.domain.SudokuBoard;
-import com.test.testing.sudoku.domain.UnsolvedSudokuDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sudoku")
 public class SudokuController {
     private final SudokuService sudokuService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public SudokuController(SudokuService sudokuService, UserRepository userRepository) {
+    public SudokuController(SudokuService sudokuService) {
         this.sudokuService = sudokuService;
-        this.userRepository = userRepository;
     }
 
     @PostMapping("/generate")
@@ -39,26 +33,41 @@ public class SudokuController {
         }
     }
 
-    @GetMapping("/{userId}")
-    public int[][] getSudokuByUserId(@PathVariable Long userId) {
-        return sudokuService.getSudokuBoardByUserId(userId);
+    @GetMapping("/board/{gameId}")
+    public int[][] getSudokuBoardByGameId(@PathVariable Integer gameId) {
+        return sudokuService.getSudokuBoardByGameId(gameId);
     }
 
-    @GetMapping("/solved/{userId}")
-    public ResponseEntity<SolvedSudokuDTO> getSolvedSudokuBoard(@PathVariable Long userId) {
-        int[][] solvedBoard = sudokuService.getSolvedSudokuBoardByUserId(userId);
-        SolvedSudokuDTO solvedSudokuDTO = new SolvedSudokuDTO(solvedBoard);
-        return ResponseEntity.ok(solvedSudokuDTO);
+    @GetMapping("/solved/{gameId}")
+    public int[][] getSolvedValueByGameId(@PathVariable Integer gameId) {
+        return sudokuService.getSolvedValueByGameId(gameId);
     }
 
-    @GetMapping("/unsolved/{userId}")
-    public ResponseEntity<UnsolvedSudokuDTO> getUnsolvedSudokuBoard(@PathVariable Long userId) {
-        int[][] unsolvedBoard = sudokuService.getSudokuBoardByUserId(userId);
-        if (unsolvedBoard != null) {
-            UnsolvedSudokuDTO unsolvedSudokuDTO = new UnsolvedSudokuDTO(unsolvedBoard);
-            return ResponseEntity.ok(unsolvedSudokuDTO);
+
+    @GetMapping("/game-ids")
+    public ResponseEntity<List<Long>> getGameIdsByCurrentUser(Principal principal) {
+        if (principal != null) {
+            String username = principal.getName();
+            List<Long> gameIds = sudokuService.findGameIdsByUsername(username);
+            return ResponseEntity.ok(gameIds);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<String> updateSudokuBoard(
+            @RequestParam Integer gameId,
+            @RequestParam Integer row,
+            @RequestParam Integer col,
+            @RequestParam Integer newValue) {
+
+        boolean updated = sudokuService.updateSudokuBoard(gameId, row, col, newValue);
+
+        if (updated) {
+            return ResponseEntity.ok("Sudoku board updated successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Sudoku board update failed. Check convergence.");
         }
     }
 }

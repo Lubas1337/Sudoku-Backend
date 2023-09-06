@@ -27,18 +27,18 @@ public class CustomUserDetailsService implements UserDetailsService {
         return build(userEntity);
     }
 
+
     public UserEntity loadUserById(Long id) {
         return userRepository.findUserById(id).orElse(null);
     }
 
-
     public static UserEntity build(UserEntity user) {
         return new UserEntity(
+                user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getAuthorities()
         );
     }
-
 }

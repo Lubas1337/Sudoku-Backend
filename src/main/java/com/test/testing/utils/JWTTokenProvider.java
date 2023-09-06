@@ -27,7 +27,7 @@ public class JWTTokenProvider {
 
     public String generateToken(Authentication authentication) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
-        String userId = Long.toString(user.getId());
+        String userId = user.getId() != null ? Long.toString(user.getId()) : ""; // Check for null
 
         Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("id", userId);
@@ -38,12 +38,13 @@ public class JWTTokenProvider {
 
         return Jwts.builder()
                 .setSubject(userId)
-                .setClaims(claimsMap)  // Set the claims including the "id" claim
+                .setClaims(claimsMap)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(key())
                 .compact();
     }
+
 
 
     public boolean validateToken(String token) {
@@ -64,13 +65,22 @@ public class JWTTokenProvider {
     }
 
     public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
-        String id = (String) claims.get("id");
-        return Long.parseLong(id);
+
+        String userIdStr = claims.get("id", String.class);
+
+        if (userIdStr != null && !userIdStr.isEmpty()) {
+            return Long.parseLong(userIdStr);
+        } else {
+            return null;
+        }
     }
+
+
 
     private Key key(){
         return Keys.hmacShaKeyFor(
